@@ -1,0 +1,41 @@
+import glob
+import os
+
+# Define base directory
+base = config["base"]
+
+# in_dir
+in_dir = config["in_dir"]
+subdir = config["subdir"]
+
+# Locate all valid kallisto.sorted_bus files
+bus_files = glob.glob(os.path.join(base, f"{in_dir}/{subdir}/*/kallisto.sorted_bus"))
+
+# Build sample mapping (flowcell, sample) -> full path
+sample_info = [
+	{
+		"input_directory": path.split("/")[-4],
+		"subdirectory" : path.split("/")[-3],
+		"sample": path.split("/")[-2]
+	}
+	for path in bus_files
+]
+
+rule all:
+	input:
+		expand(
+			os.path.join(base, "{input_directory}", "{subdirectory}", "{sample}", "sorted_bus.txt"),
+			input_directory=[s["input_directory"] for s in sample_info],
+			subdirectory=[s["subdirectory"] for s in sample_info],
+			sample=[s["sample"] for s in sample_info]
+		) 
+
+rule bustools_text:
+	input:
+		kallisto_bus=os.path.join(base, "{input_directory}", "{subdirectory}", "{sample}", "kallisto.sorted_bus")
+	output:
+		os.path.join(base, "{input_directory}", "{subdirectory}", "{sample}", "sorted_bus.txt")
+	conda:
+		"arcas-bin-osx-arm64"
+	shell:
+		"bustools text -o {output} {input.kallisto_bus}"

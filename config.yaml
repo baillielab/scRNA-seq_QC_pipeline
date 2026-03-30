@@ -1,0 +1,41 @@
+# ----------------------------
+# Project metadata
+# ----------------------------
+project:
+  name: snRNAseq_QC_pipeline
+  organism: human
+
+# ----------------------------
+# Input data
+# ----------------------------
+input:
+  type: 
+  base_dir: 
+  data_dir: 
+  plate: 
+
+# ----------------------------
+# Filtering
+# ----------------------------
+filtering:
+  markers: ['BAX', 'BCL2L11', 'BBC3', 'CASP3', 'CASP7', 'DDIT3']
+  quantile_feature: 0.95
+  feature_lim: 200
+  feature_lim_max: 600
+  quantile_mt: 0.95
+  mt_lim: 25
+  quantile_dead: 0.99
+
+# ----------------------------
+# Doublet Finder
+# ----------------------------
+doubletFinder:
+  findVariableFeatures:
+    selectionMethod: "vst"
+    nFeatures: 2000
+
+  runPCA:
+    npcs: 30
+
+  prop_exp: 0.075
+  pN: 0.25
