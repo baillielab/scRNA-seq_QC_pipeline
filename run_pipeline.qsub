@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# === SGE SETTINGS (qsub) ===
+#$ -N QC-pipeline
+#$ -cwd
+#$ -l h_rt=6:00:00
+#$ -pe sharedmem 8
+#$ -l h_vmem=4G
+#$ -o logs/QC_pipeline.out
+#$ -e logs/QC_pipeline.err
+
+# ==========================
+
+
+# === USER INPUT ===========
+ROOT=/exports/eddie/scratch/kcampb2/260416_10x_KH/QC
+ENV_PATH=/exports/eddie/scratch/kcampb2/envs/snRNA-QC
+# ==========================
+
+
+# === FILE PATHS ===========
+SNAKEFILE=${ROOT}/Snakefile
+CONFIG=${ROOT}/config.yaml
+# ==========================
+
+
+# === LOAD CONDA ===========
+source ~/.bashrc
+
+# Activate env by FULL PATH
+conda activate ${ENV_PATH}
+# ==========================
+
+
+# === RUN PIPELINE =========
+snakemake \
+  -s ${SNAKEFILE} \
+  --configfile ${CONFIG} \
+  --cores 8 \
+  -p \
+  --rerun-incomplete
+# ==========================
+

@@ -92,6 +92,57 @@ if INPUT_TYPE == "splitpipe":
             "Rscript scripts/S03_create_seurat.R {input.config}"
 
 # ----------------------------------------------------------------------------------------------------------
+#            CELLRANGER
+# ----------------------------------------------------------------------------------------------------------
+if INPUT_TYPE == "cellranger":
+
+    # ----------------------------
+    # S01 Mapping
+    # ----------------------------
+    rule mapping_CR:
+        input:
+            str(DATA_DIR / "sample-list.csv"),
+            expand(str(DATA_DIR / "{sample}" / "outs" / "metrics_summary.csv"), sample=SAMPLES),
+            config="config.yaml"
+        output:
+            str(BASE_DIR / "outputs" / "QC" / "mapping_stats" / "plate_mapping_stats.png")
+        shell:
+            "Rscript scripts/C01_mapping.R {input.config}"
+
+
+    # ----------------------------
+    # S02 Initial_QC
+    # ----------------------------
+    rule initial_QC_SP:
+        input:
+            expand(str(DATA_DIR / "{sample}" / "outs" / "raw_feature_bc_matrix" / "barcodes.tsv.gz"), sample=SAMPLES),
+            expand(str(DATA_DIR / "{sample}" / "outs" / "raw_feature_bc_matrix" / "matrix.mtx.gz"), sample=SAMPLES),
+            str(DATA_DIR / "sample-list.csv"),
+            config="config.yaml"
+        output:
+            inclusion=str(BASE_DIR / "outputs" / "QC" / "knee_inclusion.png"),
+            filter=expand(str(BASE_DIR / "outputs" / "QC" / "samples" / "{sample}" / "barcode_keep_filter.csv"), sample=SAMPLES)
+        shell:
+            "Rscript scripts/C02_initial_QC.R {input.config}"
+
+
+    # ----------------------------
+    # S03 Create Seurat
+    # ----------------------------
+    rule create_seurat_SP:
+        input:
+            expand(str(DATA_DIR / "{sample}" / "outs" / "raw_feature_bc_matrix" / "barcodes.tsv.gz"), sample=SAMPLES),
+            expand(str(DATA_DIR / "{sample}" / "outs" / "raw_feature_bc_matrix" / "matrix.mtx.gz"), sample=SAMPLES),
+            expand(str(DATA_DIR / "{sample}" / "outs" / "raw_feature_bc_matrix" / "features.tsv.gz"), sample=SAMPLES),
+            expand(str(BASE_DIR / "outputs" / "QC" / "samples" / "{sample}" / "barcode_keep_filter.csv"), sample=SAMPLES),
+            str(DATA_DIR / "sample-list.csv"),
+            config="config.yaml"
+        output:
+            seurat_list=str(BASE_DIR / "outputs" / "Seurat" / "intermediate" / "seurat_list.rds")
+        shell:
+            "Rscript scripts/C03_create_seurat.R {input.config}"
+
+# ----------------------------------------------------------------------------------------------------------
 #            ARCAS
 # ----------------------------------------------------------------------------------------------------------
 if INPUT_TYPE == "arcas":
