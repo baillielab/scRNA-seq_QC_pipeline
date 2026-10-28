@@ -110,9 +110,6 @@ for (i in 1:length(seurat_list)) {
     cell_filtering$status[which(cell_filtering$cell %in% x)]<-"excluded"
     cell_filtering$reason[which(cell_filtering$cell %in% x)]<-"sample_fail"
     
-    n<-which(names(seurat_list_filtered) == sample)
-    
-    seurat_list_filtered<-seurat_list_filtered[-(n)]
   }
   
   write.csv(cell_sample, file.path(out_dir, "QC", "samples", paste0(sample, "_cell_filtering_S05.csv")), row.names = F)

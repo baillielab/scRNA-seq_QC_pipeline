@@ -3,16 +3,16 @@
 # ----------------------------
 project:
   name: snRNAseq_QC_pipeline
-  organism: sheep
+  organism: human
 
 # ----------------------------
 # Input data
 # ----------------------------
 input:
-  type: cellranger
-  base_dir: /exports/eddie/scratch/kcampb2/260416_10x_KH/QC
+  type: splitpipe
+  base_dir: /mnt/odap-beegfs/a008/QC/plate5
   data_dir: data
-  plate: 1
+  plate: 5
 
 # ----------------------------
 # Filtering
@@ -20,7 +20,7 @@ input:
 filtering:
   mt:
     type: pattern
-    genes: ^COX
+    genes: ^MT-
   markers: ['BAX', 'BCL2L11', 'BBC3', 'CASP3', 'CASP7', 'DDIT3']
   quantile_feature: 0.95
   feature_lim: 200
